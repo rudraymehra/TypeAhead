@@ -17,6 +17,15 @@ It demonstrates the four things the assignment grades:
 
 ---
 
+## Demo — screenshots & video
+
+📹 **[Screenshots & demo video (Google Drive)](https://drive.google.com/drive/folders/1eyntcpB766UU-SwL63RFNWiiGdt_hx6C?usp=drive_link)**
+
+Walkthrough of the live UI (typeahead suggestions, trending panel, stats), cache
+hit/miss routing, and the trending/batch demos.
+
+---
+
 ## Architecture at a glance
 
 ```
