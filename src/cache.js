@@ -39,12 +39,19 @@ async function connect() {
       client.on('error', () => {}); // swallow: we degrade, never crash
       const entry = { client, node, ready: false };
       clients.set(node.id, entry);
-      try {
-        await client.connect();
-        entry.ready = true;
-      } catch (_) {
-        entry.ready = false; // stays in degraded mode; reconnect handled by client
-      }
+      // Keep `ready` accurate as the client connects / drops / reconnects, so
+      // a node that comes back later flips back to 'up' in the stats.
+      client.on('ready', () => { entry.ready = true; });
+      client.on('end', () => { entry.ready = false; });
+      // Don't let a DOWN node block startup. The reconnectStrategy retries
+      // forever, so client.connect() never settles while Redis is unreachable —
+      // cap the initial wait and proceed in degraded mode. The client keeps
+      // reconnecting in the background and self-heals when Redis returns.
+      client.connect().catch(() => {}); // swallow late rejection (no unhandled)
+      await Promise.race([
+        new Promise((res) => client.once('ready', res)),
+        new Promise((res) => setTimeout(res, 1500)),
+      ]);
     })
   );
   const up = [...clients.values()].filter((c) => c.ready).length;

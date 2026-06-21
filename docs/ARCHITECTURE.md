@@ -200,9 +200,16 @@ This is the explicit cost of not writing synchronously:
 Every Redis call in `cache.js` is wrapped in try/catch, and the client is created with
 `disableOfflineQueue: true` so commands **reject immediately** when a node is down
 instead of hanging. On any cache error we count a miss and return `null`, so the read
-path falls straight through to SQLite. Verified: with Redis stopped, `/suggest` still
-returns correct results from SQLite (~100 ms for the first degraded call vs ~0.5 ms
-cached). The system slows; it never breaks.
+path falls straight through to SQLite.
+
+Startup is also resilient: because the reconnect strategy retries forever, a blocking
+`client.connect()` would hang the server if Redis is down at boot. We cap the initial
+connect wait (race against a 1.5 s timer) and proceed in degraded mode, while the client
+keeps reconnecting in the background and flips back to "up" via the `ready` event when
+Redis returns. Verified both ways: started with Redis **down**, the server boots in
+`0/3 DEGRADED` mode and `/suggest` returns correct SQLite results in well under a second;
+started with Redis **up**, it connects `3/3` and caches normally. The system slows; it
+never breaks.
 
 ---
 
