@@ -156,6 +156,16 @@ recomputes and refills. TTL is a backstop if an invalidation is ever dropped.
   would simplify reads but add a timer and constant churn. We chose lazy for latency.
 - Invalidate-on-flush trades a brief recompute for never serving stale top-10s.
 
+> **Intended behavior of the α=0.5 blend (viva note).** Because count is min-max
+> normalized, the pool's highest-count query always contributes a full `0.5` from the
+> count term. So a fresh surge on a *low-count* query competes with — but does not
+> automatically dominate — an all-time-popular query: recency gets an equal vote, not an
+> overriding one. A surge clearly overtakes a popular term that has *no* recent activity
+> (see `trending-demo`), and ties closely when the popular term is *also* being searched.
+> This is a deliberate "balanced" choice; `α` is a single knob to make ranking twitchier
+> (lower `α`) if desired. The separate `/trending` panel is the **pure-recency** view and
+> always surfaces the hottest queries first.
+
 ---
 
 ## 5. Batch writes  *(20 marks)*
