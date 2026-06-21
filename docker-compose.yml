@@ -1,0 +1,24 @@
+# OPTIONAL: three REAL Redis processes, so the distributed cache spans three
+# separate servers instead of three logical DBs on one instance.
+#
+#   docker compose up -d        (or: npm run redis:up)
+#
+# Then switch src/config.js REDIS_NODES to distinct ports:
+#   { id: 'cache-node-0', host: '127.0.0.1', port: 6379, db: 0 }
+#   { id: 'cache-node-1', host: '127.0.0.1', port: 6380, db: 0 }
+#   { id: 'cache-node-2', host: '127.0.0.1', port: 6381, db: 0 }
+#
+# The consistent-hash ring and all app code are identical either way.
+services:
+  redis-0:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["6379:6379"]
+  redis-1:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["6380:6379"]
+  redis-2:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["6381:6379"]
