@@ -1,0 +1,25 @@
+{
+  "name": "search-typeahead",
+  "version": "1.0.0",
+  "description": "Distributed low-latency search typeahead — SQLite source of truth, Redis distributed cache with consistent hashing, recency-aware trending, batched writes.",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "load-data": "node scripts/load-data.js",
+    "ring-demo": "node scripts/ring-demo.js",
+    "trending-demo": "node scripts/trending-demo.js",
+    "batch-demo": "node scripts/batch-demo.js",
+    "perf-bench": "node scripts/perf-bench.js",
+    "redis:up": "docker compose up -d",
+    "redis:down": "docker compose down"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "express": "^4.21.2",
+    "redis": "^4.7.0"
+  },
+  "license": "MIT"
+}
